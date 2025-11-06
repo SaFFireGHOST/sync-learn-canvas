@@ -1,18 +1,20 @@
 import { motion } from "framer-motion";
-import { MessageCircle, Bot, Pencil } from "lucide-react";
+import { MessageCircle, Bot, Pencil, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface PauseOverlayProps {
   onAskDoubt: () => void;
   onAskAI: () => void;
   onOpenBoard: () => void;
+  onClose: () => void;
 }
 
-const PauseOverlay = ({ onAskDoubt, onAskAI, onOpenBoard }: PauseOverlayProps) => {
-  const overlayVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
+const PauseOverlay = ({ onAskDoubt, onAskAI, onOpenBoard, onClose }: PauseOverlayProps) => {
+  const menuVariants = {
+    hidden: { opacity: 0, y: -20, scale: 0.9 },
     visible: { 
       opacity: 1, 
+      y: 0,
       scale: 1,
       transition: {
         duration: 0.3
@@ -20,6 +22,7 @@ const PauseOverlay = ({ onAskDoubt, onAskAI, onOpenBoard }: PauseOverlayProps) =
     },
     exit: { 
       opacity: 0, 
+      y: -20,
       scale: 0.9,
       transition: {
         duration: 0.2
@@ -27,69 +30,53 @@ const PauseOverlay = ({ onAskDoubt, onAskAI, onOpenBoard }: PauseOverlayProps) =
     }
   };
 
-  const buttonVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: (i: number) => ({
-      y: 0,
-      opacity: 1,
-      transition: {
-        delay: 0.1 + i * 0.1,
-        duration: 0.3
-      }
-    })
-  };
-
   return (
     <motion.div
-      variants={overlayVariants}
+      variants={menuVariants}
       initial="hidden"
       animate="visible"
       exit="exit"
-      className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-sm z-10"
+      className="absolute top-4 right-4 z-10 glass-card p-4 border-2 border-primary/20"
     >
-      <div className="flex flex-col gap-4">
-        <motion.div
-          custom={0}
-          variants={buttonVariants}
-        >
+      <div className="flex flex-col gap-2 min-w-[200px]">
+        <div className="flex justify-between items-center mb-2">
+          <span className="text-sm font-medium text-muted-foreground">Quick Actions</span>
           <Button
-            onClick={onAskDoubt}
-            size="lg"
-            className="glass-card gap-3 px-8 py-6 text-lg hover-lift border-2 border-primary/20"
+            variant="ghost"
+            size="icon"
+            className="h-6 w-6"
+            onClick={onClose}
           >
-            <MessageCircle className="w-6 h-6" />
-            Ask a Doubt
+            <X className="w-4 h-4" />
           </Button>
-        </motion.div>
+        </div>
 
-        <motion.div
-          custom={1}
-          variants={buttonVariants}
+        <Button
+          onClick={onAskDoubt}
+          variant="outline"
+          className="gap-2 justify-start hover-lift"
         >
-          <Button
-            onClick={onAskAI}
-            size="lg"
-            variant="secondary"
-            className="glass-card gap-3 px-8 py-6 text-lg hover-lift border-2 border-secondary/20"
-          >
-            <Bot className="w-6 h-6" />
-            Ask AI Bot
-          </Button>
-        </motion.div>
+          <MessageCircle className="w-4 h-4" />
+          Ask a Doubt
+        </Button>
 
-        <motion.div
-          custom={2}
-          variants={buttonVariants}
+        <Button
+          onClick={onAskAI}
+          variant="outline"
+          className="gap-2 justify-start hover-lift"
         >
-          <Button
-            onClick={onOpenBoard}
-            size="lg"
-            className="glass-card gap-3 px-8 py-6 text-lg hover-lift border-2 border-accent/20 bg-accent text-accent-foreground"
-          >
-            <Pencil className="w-6 h-6" />
-            Open Board
-          </Button>
-        </motion.div>
+          <Bot className="w-4 h-4" />
+          Ask AI Bot
+        </Button>
+
+        <Button
+          onClick={onOpenBoard}
+          variant="outline"
+          className="gap-2 justify-start hover-lift"
+        >
+          <Pencil className="w-4 h-4" />
+          Open Board
+        </Button>
       </div>
     </motion.div>
   );

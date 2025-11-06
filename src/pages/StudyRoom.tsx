@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import VideoPlayer from "@/components/VideoPlayer";
 import CollaborationPanel from "@/components/CollaborationPanel";
 import PauseOverlay from "@/components/PauseOverlay";
-import Whiteboard from "@/components/Whiteboard";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -12,26 +11,27 @@ import { Link } from "react-router-dom";
 const StudyRoom = () => {
   const { roomId } = useParams();
   const [isPaused, setIsPaused] = useState(false);
-  const [showWhiteboard, setShowWhiteboard] = useState(false);
-  const [activeTab, setActiveTab] = useState<"comments" | "chat" | "ai">("comments");
+  const [showPauseMenu, setShowPauseMenu] = useState(false);
+  const [activeTab, setActiveTab] = useState<"comments" | "chat" | "ai" | "whiteboard">("comments");
 
   const handlePause = (paused: boolean) => {
     setIsPaused(paused);
+    setShowPauseMenu(paused);
   };
 
   const handleAskDoubt = () => {
     setActiveTab("chat");
-    setIsPaused(false);
+    setShowPauseMenu(false);
   };
 
   const handleAskAI = () => {
     setActiveTab("ai");
-    setIsPaused(false);
+    setShowPauseMenu(false);
   };
 
   const handleOpenBoard = () => {
-    setShowWhiteboard(true);
-    setIsPaused(false);
+    setActiveTab("whiteboard");
+    setShowPauseMenu(false);
   };
 
   return (
@@ -67,11 +67,12 @@ const StudyRoom = () => {
               <VideoPlayer onPause={handlePause} />
               
               <AnimatePresence>
-                {isPaused && (
+                {showPauseMenu && (
                   <PauseOverlay
                     onAskDoubt={handleAskDoubt}
                     onAskAI={handleAskAI}
                     onOpenBoard={handleOpenBoard}
+                    onClose={() => setShowPauseMenu(false)}
                   />
                 )}
               </AnimatePresence>
@@ -88,13 +89,6 @@ const StudyRoom = () => {
           </motion.div>
         </div>
       </div>
-
-      {/* Whiteboard Modal */}
-      <AnimatePresence>
-        {showWhiteboard && (
-          <Whiteboard onClose={() => setShowWhiteboard(false)} />
-        )}
-      </AnimatePresence>
     </div>
   );
 };

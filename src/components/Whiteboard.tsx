@@ -1,14 +1,9 @@
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
-import { X, Pencil, Eraser, Undo, Download } from "lucide-react";
+import { Pencil, Eraser, Undo, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
-interface WhiteboardProps {
-  onClose: () => void;
-}
-
-const Whiteboard = ({ onClose }: WhiteboardProps) => {
+const Whiteboard = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [tool, setTool] = useState<"pen" | "eraser">("pen");
@@ -31,9 +26,12 @@ const Whiteboard = ({ onClose }: WhiteboardProps) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Set canvas size
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    // Set canvas size to container
+    const container = canvas.parentElement;
+    if (container) {
+      canvas.width = container.clientWidth;
+      canvas.height = container.clientHeight - 80; // Account for toolbar height
+    }
 
     // Set white background
     ctx.fillStyle = "#ffffff";
@@ -104,24 +102,15 @@ const Whiteboard = ({ onClose }: WhiteboardProps) => {
   };
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 bg-background"
-    >
+    <div className="h-full flex flex-col">
       {/* Toolbar */}
-      <motion.div
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        className="absolute top-4 left-1/2 -translate-x-1/2 glass-card p-4 flex items-center gap-4"
-      >
+      <div className="p-4 border-b border-border/50 flex flex-wrap items-center gap-3">
         <Button
           variant={tool === "pen" ? "default" : "outline"}
           size="icon"
           onClick={() => setTool("pen")}
         >
-          <Pencil className="w-5 h-5" />
+          <Pencil className="w-4 h-4" />
         </Button>
 
         <Button
@@ -129,7 +118,7 @@ const Whiteboard = ({ onClose }: WhiteboardProps) => {
           size="icon"
           onClick={() => setTool("eraser")}
         >
-          <Eraser className="w-5 h-5" />
+          <Eraser className="w-4 h-4" />
         </Button>
 
         <div className="h-8 w-px bg-border" />
@@ -140,7 +129,7 @@ const Whiteboard = ({ onClose }: WhiteboardProps) => {
             <button
               key={c}
               onClick={() => setColor(c)}
-              className={`w-8 h-8 rounded-full border-2 transition-transform hover:scale-110 ${
+              className={`w-6 h-6 rounded-full border-2 transition-transform hover:scale-110 ${
                 color === c ? "border-foreground scale-110" : "border-border"
               }`}
               style={{ backgroundColor: c }}
@@ -151,44 +140,40 @@ const Whiteboard = ({ onClose }: WhiteboardProps) => {
         <div className="h-8 w-px bg-border" />
 
         {/* Line Width */}
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">Width</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-muted-foreground">Width</span>
           <Slider
             value={lineWidth}
             onValueChange={setLineWidth}
             min={1}
             max={20}
-            className="w-32"
+            className="w-24"
           />
         </div>
 
         <div className="h-8 w-px bg-border" />
 
         <Button variant="outline" size="icon" onClick={clearCanvas}>
-          <Undo className="w-5 h-5" />
+          <Undo className="w-4 h-4" />
         </Button>
 
         <Button variant="outline" size="icon" onClick={downloadCanvas}>
-          <Download className="w-5 h-5" />
+          <Download className="w-4 h-4" />
         </Button>
-
-        <div className="h-8 w-px bg-border" />
-
-        <Button variant="outline" size="icon" onClick={onClose}>
-          <X className="w-5 h-5" />
-        </Button>
-      </motion.div>
+      </div>
 
       {/* Canvas */}
-      <canvas
-        ref={canvasRef}
-        onMouseDown={startDrawing}
-        onMouseMove={draw}
-        onMouseUp={stopDrawing}
-        onMouseLeave={stopDrawing}
-        className="cursor-crosshair"
-      />
-    </motion.div>
+      <div className="flex-1 relative">
+        <canvas
+          ref={canvasRef}
+          onMouseDown={startDrawing}
+          onMouseMove={draw}
+          onMouseUp={stopDrawing}
+          onMouseLeave={stopDrawing}
+          className="cursor-crosshair w-full h-full"
+        />
+      </div>
+    </div>
   );
 };
 
