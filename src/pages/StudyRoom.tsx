@@ -7,16 +7,15 @@ import PauseOverlay from "@/components/PauseOverlay";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { Link } from "react-router-dom";
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable";
 
 const StudyRoom = () => {
   const { roomId } = useParams();
-  const [isPaused, setIsPaused] = useState(false);
   const [showPauseMenu, setShowPauseMenu] = useState(false);
   const [activeTab, setActiveTab] = useState<"comments" | "chat" | "ai" | "whiteboard">("comments");
 
-  const handlePause = (paused: boolean) => {
-    setIsPaused(paused);
-    setShowPauseMenu(paused);
+  const handleMenuToggle = () => {
+    setShowPauseMenu(!showPauseMenu);
   };
 
   const handleAskDoubt = () => {
@@ -56,38 +55,44 @@ const StudyRoom = () => {
 
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <ResizablePanelGroup direction="horizontal" className="gap-6">
           {/* Video Player Section */}
-          <motion.div 
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-2"
-          >
-            <div className="relative">
-              <VideoPlayer onPause={handlePause} />
-              
-              <AnimatePresence>
-                {showPauseMenu && (
-                  <PauseOverlay
-                    onAskDoubt={handleAskDoubt}
-                    onAskAI={handleAskAI}
-                    onOpenBoard={handleOpenBoard}
-                    onClose={() => setShowPauseMenu(false)}
-                  />
-                )}
-              </AnimatePresence>
-            </div>
-          </motion.div>
+          <ResizablePanel defaultSize={65} minSize={30}>
+            <motion.div 
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="h-full"
+            >
+              <div className="relative">
+                <VideoPlayer onMenuToggle={handleMenuToggle} />
+                
+                <AnimatePresence>
+                  {showPauseMenu && (
+                    <PauseOverlay
+                      onAskDoubt={handleAskDoubt}
+                      onAskAI={handleAskAI}
+                      onOpenBoard={handleOpenBoard}
+                      onClose={() => setShowPauseMenu(false)}
+                    />
+                  )}
+                </AnimatePresence>
+              </div>
+            </motion.div>
+          </ResizablePanel>
+
+          <ResizableHandle withHandle />
 
           {/* Collaboration Panel */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            className="lg:col-span-1"
-          >
-            <CollaborationPanel activeTab={activeTab} onTabChange={setActiveTab} />
-          </motion.div>
-        </div>
+          <ResizablePanel defaultSize={35} minSize={25}>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="h-full"
+            >
+              <CollaborationPanel activeTab={activeTab} onTabChange={setActiveTab} />
+            </motion.div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </div>
   );

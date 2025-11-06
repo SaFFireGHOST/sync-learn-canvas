@@ -1,13 +1,13 @@
 import { useState, useRef } from "react";
-import { Play, Pause, Volume2, VolumeX, Maximize } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Maximize, Menu } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
 interface VideoPlayerProps {
-  onPause: (paused: boolean) => void;
+  onMenuToggle: () => void;
 }
 
-const VideoPlayer = ({ onPause }: VideoPlayerProps) => {
+const VideoPlayer = ({ onMenuToggle }: VideoPlayerProps) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [progress, setProgress] = useState(0);
@@ -18,10 +18,8 @@ const VideoPlayer = ({ onPause }: VideoPlayerProps) => {
     if (videoRef.current) {
       if (isPlaying) {
         videoRef.current.pause();
-        onPause(true);
       } else {
         videoRef.current.play();
-        onPause(false);
       }
       setIsPlaying(!isPlaying);
     }
@@ -51,6 +49,16 @@ const VideoPlayer = ({ onPause }: VideoPlayerProps) => {
   return (
     <div className="glass-card overflow-hidden">
       <div className="relative bg-gradient-to-br from-primary/5 to-secondary/5 aspect-video">
+        {/* Hamburger Menu */}
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={onMenuToggle}
+          className="absolute top-4 right-4 z-10 bg-black/40 hover:bg-black/60 text-white"
+        >
+          <Menu className="w-5 h-5" />
+        </Button>
+
         {/* Placeholder for video - in real app, use actual video element */}
         <video
           ref={videoRef}
